@@ -15,31 +15,48 @@ var options = {
 const prefix = `!!`;
 
 const channels = [];
-let generalChannelId;
+
 
 client.on('ready', async () => {
   // List servers the client is connected to
   console.log("Servers:")
   client.guilds.cache.forEach((guild) => {
     console.log(" - " + guild.name);
+    let positivityChannelId;
 
     // List all channels
-    guild.channels.cache.forEach((channel) => {
+    guild.channels.cache.forEach(channel => {
       console.log(` -- ${channel.name} (${channel.type}) - ${channel.id}`)
-      channels.push(channel);
-      if (channel.name === `general`) {
-        generalChannelId = channel.id;
+      // console.log(` -- ${channel.name} -- ${Object.getOwnPropertyNames(channel)}`);
+      // channel.permissionOverwrites.forEach(permissionOverwrite => {
+      //   console.log(permissionOverwrite.allow >= 1024);
+      // })
+      // console.log(`permissionOverwrites: `, channel.permissionOverwrites);
+      // console.log(channel.permissionOverwrites.some(permissionOverwrite => permissionOverwrite.allow >= 1024));
+      // Object.getOwnPropertyNames(channel).forEach(key => {
+      //   console.log(`${key}:`, channel[key]);
+      // })
+      if (channel.type === `text`) {
+        if (channel.name === `general` && positivityChannelId === undefined) {
+          positivityChannelId = channel.id;
+        }
+        if (channel.name === `positivity`) {
+          positivityChannelId = channel.id;
+        }
       }
     })
+    sendMessage(positivityChannelId);
   });
-  
+});
+
+const sendMessage = async channelId => {
   try {
-    const generalChannel = await client.channels.fetch(generalChannelId);
-    generalChannel.send(getQuote());
+    const channel = await client.channels.fetch(channelId);
+    channel.send(getQuote());
   } catch (err) {
     console.log(err);
   }
-});
+}
 
 client.on(`message`, async msg => {
   // console.log(msg);
