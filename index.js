@@ -1,3 +1,5 @@
+// ------------ import modules
+
 require('dotenv').config();
 const Discord = require('discord.js');
 const quotes = require('./quotes.json');
@@ -5,6 +7,7 @@ const axios = require("axios").default;
 const client = new Discord.Client();
 
 // ------------ log in client
+
 client.login(process.env.AUTH_TOKEN);
 
 // ------------ consts
