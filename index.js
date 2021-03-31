@@ -1,18 +1,22 @@
 require('dotenv').config();
 const Discord = require('discord.js');
 const quotes = require('./quotes.json');
-
+const axios = require("axios").default;
 const client = new Discord.Client();
+
+// ------------ log in client
 client.login(process.env.AUTH_TOKEN);
 
-var axios = require("axios").default;
+// ------------ consts
 
-var options = {
+const options = {
   method: `GET`,
   url: `https://zenquotes.io/api/random`,
 };
 
 const prefix = `!!`;
+
+// ------------ utility functions 
 
 const getQuote = () => quotes[getRandomInt(0, quotes.length)];
 
@@ -35,25 +39,7 @@ const getRandomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
 
-const timeToMs = (hours = 0, minutes = 0, seconds = 0, ms = 0) => {
-  let time = 0;
-  time += ms;
-  time += seconds * 1000;
-  time += minutes * 1000 * 60;
-  time += hours * 1000 * 60 * 24;
-  return time;
-}
-
-// ------------ events
-
-client.on('ready', async () => {
-  const random = getRandomInt(0, 2);
-  console.log(random);
-  // List servers the client is connected to
-  if([1].includes(random)){
-    pingServers();
-  }
-});
+// ------------ messaging functions
 
 const pingServers = async () => {
   console.log("Servers:")
@@ -64,15 +50,6 @@ const pingServers = async () => {
     // List all channels
     guild.channels.cache.forEach(channel => {
       console.log(` -- ${channel.name} (${channel.type}) - ${channel.id}`)
-      // console.log(` -- ${channel.name} -- ${Object.getOwnPropertyNames(channel)}`);
-      // channel.permissionOverwrites.forEach(permissionOverwrite => {
-      //   console.log(permissionOverwrite.allow >= 1024);
-      // })
-      // console.log(`permissionOverwrites: `, channel.permissionOverwrites);
-      // console.log(channel.permissionOverwrites.some(permissionOverwrite => permissionOverwrite.allow >= 1024));
-      // Object.getOwnPropertyNames(channel).forEach(key => {
-      //   console.log(`${key}:`, channel[key]);
-      // })
       if (channel.type === `text`) {
         if (channel.name === `general` && positivityChannelId === undefined) {
           positivityChannelId = channel.id;
@@ -95,8 +72,18 @@ const sendMessage = async channelId => {
   }
 }
 
+// ------------ event handlers
+
+client.on('ready', async () => {
+  const random = getRandomInt(0, 2);
+  console.log(random);
+  // List servers the client is connected to
+  if([1].includes(random)){
+    pingServers();
+  }
+});
+
 client.on(`message`, async msg => {
-  // console.log(msg);
   if (msg.author.bot) return;
 
   if (!msg.content.startsWith(prefix)) return;
@@ -115,12 +102,3 @@ client.on(`message`, async msg => {
     msg.channel.send(getQuote());
   }
 });
-
-// setInterval(() => {
-//   const random = getRandomInt(0, 60);
-//   console.log(random);
-//   if([25, 33, 57, 20, 1].includes(random)){
-//     pingServers();
-//   }
-// }, timeToMs(0, 0, 1, 0));
-
