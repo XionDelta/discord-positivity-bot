@@ -1,5 +1,5 @@
 // ------------ import modules
-const quotes = require('./quotes.json');
+const quotes = require('./data/quotes.json');
 const axios = require("axios").default;
 
 // ------------ constants
