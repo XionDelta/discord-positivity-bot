@@ -5,57 +5,61 @@ const client = new Discord.Client();
 
 const { getQuote, getOnlineQuote, getRandomInt } = require('./utilities');
 
+// ------------ constants
+const prefix = `!!`; // command prefix
+
+// ------------ messaging functions
+const pingServers = async () => {
+  console.log(`Servers:`)
+  client.guilds.cache.forEach((guild) => {
+    console.log(` - ${guild.name} - ${guild.id}`);
+    let positivityChannelId;
+
+    if (process.env.DEV === `true` && guild.id === `819962399888637983` || process.env.DEV === undefined) {
+      // List all channels
+      guild.channels.cache.forEach(channel => {
+        channel.type === `text` && console.log(`  > ${channel.name} (${channel.type}) - ${channel.id}`)
+        if (channel.type === `text`) {
+          if (channel.name === `general` && positivityChannelId === undefined) {
+            positivityChannelId = channel.id;
+          }
+          if (channel.name === `positivity`) {
+            positivityChannelId = channel.id;
+          }
+        }
+      });
+      randomizeSendMessage(positivityChannelId);
+    }
+  });
+}
+
+const randomizeSendMessage = channelId => {
+  const randomInt = getRandomInt(0, 2);
+  // console.log(randomInt);
+  if (randomInt === 0) {
+    sendMessage(channelId);
+  }
+}
+
+const sendMessage = async channelId => {
+  try {
+    const channel = await client.channels.fetch(channelId);
+    const quote = getQuote();
+    console.log(`sending to ${channelId}: ${quote}`);
+    channel.send(quote);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 const pingDiscord = () => {
   // ------------ log in client
   client.login(process.env.AUTH_TOKEN);
 
-  // ------------ constants
-  const prefix = `!!`; // command prefix
-
-  // ------------ messaging functions
-  const pingServers = async () => {
-    console.log(`Servers:`)
-    client.guilds.cache.forEach((guild) => {
-      console.log(` - ` + guild.name);
-      let positivityChannelId;
-
-      if (process.env.DEV === `true` && guild.name === `Sy's server` || process.env.DEV === undefined) {
-        // List all channels
-        guild.channels.cache.forEach(channel => {
-          channel.type === `text` && console.log(` -- ${channel.name} (${channel.type}) - ${channel.id}`)
-          if (channel.type === `text`) {
-            if (channel.name === `general` && positivityChannelId === undefined) {
-              positivityChannelId = channel.id;
-            }
-            if (channel.name === `positivity`) {
-              positivityChannelId = channel.id;
-            }
-          }
-        });
-        sendMessage(positivityChannelId);
-      }
-    });
-  }
-
-  const sendMessage = async channelId => {
-    try {
-      const channel = await client.channels.fetch(channelId);
-      const quote = getQuote();
-      console.log(`sending to ${channelId}: ${quote}`);
-      channel.send(quote);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
   // ------------ event handlers
   client.on('ready', async () => {
-    const random = getRandomInt(0, 2);
-    console.log(random);
     // List servers the client is connected to
-    // if([1].includes(random)){
     pingServers();
-    // }
   });
 
   client.on(`message`, async msg => {
