@@ -2,6 +2,7 @@
 require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const config = require('./config');
 
 const { getQuote, getOnlineQuote, getRandomInt } = require('./utilities');
 
@@ -15,7 +16,7 @@ const pingServers = async () => {
     console.log(` - ${guild.name} - ${guild.id}`);
     let positivityChannelId;
 
-    if (process.env.DEV === `true` && guild.id === `819962399888637983` || process.env.DEV === undefined) {
+    if (process.env.DEV === `true` && guild.id === process.env.TEST_SERVER || process.env.DEV === undefined) {
       // List all channels
       guild.channels.cache.forEach(channel => {
         channel.type === `text` && console.log(`  > ${channel.name} (${channel.type}) - ${channel.id}`)
@@ -33,8 +34,10 @@ const pingServers = async () => {
   });
 }
 
-const randomizeSendMessage = channelId => {
-  const randomInt = getRandomInt(0, 2);
+const randomizeSendMessage = (channelId, maxRandom) => {
+  const max = maxRandom || config.MAX_RANDOM_SEND_CHANCE || 1;
+  // defaults to always sending
+  const randomInt = getRandomInt(0, max);
   // console.log(randomInt);
   if (randomInt === 0) {
     sendMessage(channelId);
