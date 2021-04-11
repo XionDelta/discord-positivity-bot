@@ -13,25 +13,34 @@ const prefix = `!!`; // command prefix
 const pingServers = async () => {
   console.log(`Servers:`)
   client.guilds.cache.forEach((guild) => {
-    console.log(` - ${guild.name} - ${guild.id}`);
-    let positivityChannelId;
+    console.log(`Server: ${guild.name} - ${guild.id}`);
+    console.log(` > Text Channels: `, guild.channels.cache.map(channel => `${channel.name} - ${channel.id}`));
 
     if (process.env.DEV === `true` && guild.id === process.env.TEST_SERVER || process.env.DEV === undefined) {
-      // List all channels
-      guild.channels.cache.forEach(channel => {
-        channel.type === `text` && console.log(`  > ${channel.name} (${channel.type}) - ${channel.id}`)
-        if (channel.type === `text`) {
-          if (channel.name === `general` && positivityChannelId === undefined) {
-            positivityChannelId = channel.id;
-          }
-          if (channel.name === `positivity`) {
-            positivityChannelId = channel.id;
-          }
-        }
-      });
+      let positivityChannelId = getPrioritizedChannelId(guild.channels.cache, `positivity`);
+      // console.log(positivityChannelId);
       randomizeSendMessage(positivityChannelId);
     }
   });
+}
+
+const getPrioritizedChannelId = (channels, priorityChannelName) => {
+  let prioritizedChannelId;
+
+  for (let channel of channels.values()) {
+    if (channel.type === `text`) {
+
+      if (channel.name === priorityChannelName) {
+        prioritizedChannelId = channel.id;
+        break;
+      }
+      if (channel.name === `general` && prioritizedChannelId === undefined) {
+        prioritizedChannelId = channel.id;
+      }
+
+    }
+  }
+  return prioritizedChannelId !== undefined ? prioritizedChannelId : channels.first().id;
 }
 
 const randomizeSendMessage = (channelId, maxRandom) => {
