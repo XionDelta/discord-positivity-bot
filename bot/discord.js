@@ -11,7 +11,6 @@ const prefix = `!!`; // command prefix
 
 // ------------ messaging functions
 const pingServers = async () => {
-  console.log(`Servers:`)
   client.guilds.cache.forEach((guild) => {
     console.log(`Server: ${guild.name} - ${guild.id}`);
     console.log(` > Text Channels: `, guild.channels.cache.map(channel => `${channel.name} - ${channel.id}`));
