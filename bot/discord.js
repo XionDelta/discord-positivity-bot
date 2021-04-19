@@ -11,6 +11,7 @@ const prefix = `!!`; // command prefix
 
 // ------------ messaging functions
 const pingServers = async () => {
+  // List servers the client is connected to
   client.guilds.cache.forEach((guild) => {
     console.log(`Server: ${guild.name} - ${guild.id}`);
     console.log(` > Text Channels: `, guild.channels.cache.map(channel => `${channel.name} - ${channel.id}`));
@@ -69,7 +70,6 @@ const pingDiscord = () => {
 
   // ------------ event handlers
   client.on('ready', async () => {
-    // List servers the client is connected to
     pingServers();
   });
 
