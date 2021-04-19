@@ -43,7 +43,7 @@ const getPrioritizedChannelId = (channels, priorityChannelName) => {
 }
 
 const randomizeSendMessage = (channelId, maxRandom) => {
-  const max = maxRandom || config.MAX_RANDOM_SEND_CHANCE || 1;
+  const max = maxRandom || config.RANDOM_MAX_VALUE_FOR_SEND_CHANCE || 1;
   // defaults to always sending
   const randomInt = getRandomInt(0, max);
   // console.log(randomInt);

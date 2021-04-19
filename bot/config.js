@@ -1,3 +1,3 @@
 module.exports = {
-  MAX_RANDOM_SEND_CHANCE: 8
+  RANDOM_MAX_VALUE_FOR_SEND_CHANCE: 12
 }
