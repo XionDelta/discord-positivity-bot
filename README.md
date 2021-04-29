@@ -42,4 +42,4 @@ The following command will manually deploy the local source into GCP
 ```
 gcloud functions deploy positivity-bot --project {project} --trigger-topic trigger-positivity-message --runtime nodejs14 --region {region} --entry-point pingDiscord
 ```
-This will eventually be automatically triggered when a commit is made to or PR is merged into the main branch
+This is automatically triggered by cloud build on merge into main.
