@@ -22,9 +22,8 @@ const pingServers = async () => {
 }
 
 const pingServer = async server => {
-  logServerDetails(server);
-
-  if (shouldSendMessage) {
+  if (shouldSendMessage(server.id)) {
+    logServerDetails(server);
     let positivityChannelId = getPrioritizedChannelId(server.channels.cache, `positivity`);
     // console.log(positivityChannelId);
     sendMessageWithRandomChance(positivityChannelId);
@@ -41,7 +40,7 @@ const logServerDetails = async server => {
   console.log(` > Text Channels: `, server.channels.cache.map(channel => `${channel.name} - ${channel.id}`));
 }
 
-const shouldSendMessage = () => (process.env.DEV === `true` && server.id === process.env.TEST_SERVER) || process.env.DEV === undefined
+const shouldSendMessage = serverId => (process.env.DEV === `true` && serverId === process.env.TEST_SERVER) || process.env.DEV === undefined
 
 const getPrioritizedChannelId = (channels, priorityChannelName) => {
   let prioritizedChannelId;
