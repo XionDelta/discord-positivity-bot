@@ -11,11 +11,14 @@ const {
   leadingZero,
 } = require('./utilities');
 
+let now;
+
 // ------------ constants
 const prefix = `!!`; // command prefix
 
 // ------------ messaging functions
 const pingServers = async () => {
+  now = new Date();
   showTime();
   // List servers the client is connected to
   client.guilds.cache.forEach(pingServer);
@@ -31,7 +34,6 @@ const pingServer = async server => {
 }
 
 const showTime = () => {
-  const now = new Date();
   console.log(`Trigger time: ${leadingZero(now.getHours())}:${leadingZero(now.getMinutes())}`);
 }
 
@@ -40,7 +42,9 @@ const logServerDetails = async server => {
   console.log(` > Text Channels: `, server.channels.cache.map(channel => `${channel.name} - ${channel.id}`));
 }
 
-const shouldSendMessage = serverId => (process.env.DEV === `true` && serverId === process.env.TEST_SERVER) || process.env.DEV === undefined
+const isOnTheHour = () => now.getMinutes === 0;
+const isDev = serverId => process.env.DEV === `true` && serverId === process.env.TEST_SERVER
+const shouldSendMessage = serverId => isDev(serverId) || (process.env.DEV === undefined && isOnTheHour());
 
 const getPrioritizedChannelId = (channels, priorityChannelName) => {
   let prioritizedChannelId;
