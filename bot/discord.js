@@ -11,6 +11,7 @@ const prefix = `!!`; // command prefix
 
 // ------------ messaging functions
 const pingServers = async () => {
+  showTime();
   // List servers the client is connected to
   client.guilds.cache.forEach(pingServer);
 }
@@ -24,6 +25,14 @@ const pingServer = async server => {
     sendMessageWithRandomChance(positivityChannelId);
   }
 }
+
+const showTime = () => {
+  const now = new Date();
+  console.log(`h: `, leadingZero(now.getHours()));
+  console.log(`m: `, leadingZero(now.getMinutes()));
+}
+
+const leadingZero = number => number < 10 ? `0${number}` : number;
 
 const logServerDetails = async server => {
   console.log(`Server: ${server.name} - ${server.id}`);
