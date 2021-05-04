@@ -27,8 +27,11 @@ const getRandomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
 
+const leadingZero = number => number < 10 ? `0${number}` : number;
+
 module.exports = {
   getQuote,
   getOnlineQuote,
-  getRandomInt
+  getRandomInt,
+  leadingZero,
 }

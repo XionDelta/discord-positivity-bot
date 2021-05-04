@@ -4,7 +4,12 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const config = require('./config');
 
-const { getQuote, getOnlineQuote, getRandomInt } = require('./utilities');
+const {
+  getQuote,
+  getOnlineQuote,
+  getRandomInt,
+  leadingZero,
+} = require('./utilities');
 
 // ------------ constants
 const prefix = `!!`; // command prefix
@@ -28,11 +33,8 @@ const pingServer = async server => {
 
 const showTime = () => {
   const now = new Date();
-  console.log(`h: `, leadingZero(now.getHours()));
-  console.log(`m: `, leadingZero(now.getMinutes()));
+  console.log(`Trigger time: ${leadingZero(now.getHours())}:${leadingZero(now.getMinutes())}`);
 }
-
-const leadingZero = number => number < 10 ? `0${number}` : number;
 
 const logServerDetails = async server => {
   console.log(`Server: ${server.name} - ${server.id}`);
