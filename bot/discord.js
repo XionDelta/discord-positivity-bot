@@ -85,12 +85,17 @@ const sendMessage = async channelId => {
   }
 }
 
-const pingDiscord = () => {
+const pingDiscord = async () => {
   // ------------ log in client
-  client.login(process.env.AUTH_TOKEN);
+  if (!client.readyAt) {
+   await client.login(process.env.AUTH_TOKEN);
+  } else {
+    pingServers();
+  }
 
   // ------------ event handlers
   client.on('ready', async () => {
+    console.log(`ready, ${client.readyAt}`);
     pingServers();
   });
 
@@ -111,6 +116,11 @@ const pingDiscord = () => {
     if (command === `inspire`) {
       console.log(`inspire command`);
       msg.channel.send(getQuote());
+    }
+
+    if (command === `uptime`) {
+      console.log(`uptime command`);
+      msg.channel.send(`Ready at: ${client.readyAt}, uptime: ${client.uptime}`);
     }
   });
 }
