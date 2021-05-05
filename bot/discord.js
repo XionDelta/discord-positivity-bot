@@ -25,8 +25,9 @@ const pingServers = async () => {
 }
 
 const pingServer = async server => {
+  logServerDetails(server);
+
   if (shouldSendMessage(server.id)) {
-    logServerDetails(server);
     let positivityChannelId = getPrioritizedChannelId(server.channels.cache, `positivity`);
     // console.log(positivityChannelId);
     sendMessageWithRandomChance(positivityChannelId);
