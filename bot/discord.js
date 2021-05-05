@@ -44,7 +44,7 @@ const logServerDetails = async server => {
 
 const isOnTheHour = () => now.getMinutes === 0;
 const isDev = serverId => process.env.DEV === `true` && serverId === process.env.TEST_SERVER
-const shouldSendMessage = serverId => isDev(serverId) || (process.env.DEV === undefined && isOnTheHour());
+const shouldSendMessage = serverId => isDev(serverId) || (process.env.DEV === undefined);
 
 const getPrioritizedChannelId = (channels, priorityChannelName) => {
   let prioritizedChannelId;
