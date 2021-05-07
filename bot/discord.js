@@ -43,14 +43,7 @@ const logServerDetails = async server => {
 
 const isOnTheHour = time => time.getMinutes() === 0;
 const isDev = serverId => process.env.DEV === `true` && serverId === process.env.TEST_SERVER;
-const shouldSendMessage = (serverId, time) => {
-  // console.log(`isdev `, isDev(serverId));
-  // console.log(`DEV false`, !process.env.DEV);
-  // console.log(`onthehour `, isOnTheHour(time));
-  // console.log(`together `, (!process.env.DEV && isOnTheHour(time)));
-  // console.log(`all `, isDev(serverId) || (!process.env.DEV && isOnTheHour(time)));
-  return isDev(serverId) || (!process.env.DEV && isOnTheHour(time));
-}
+const shouldSendMessage = (serverId, time) => isDev(serverId) || (!process.env.DEV && isOnTheHour(time));
 
 const getPrioritizedChannelId = (channels, priorityChannelName) => {
   let prioritizedChannelId;
