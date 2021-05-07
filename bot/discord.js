@@ -11,31 +11,29 @@ const {
   leadingZero,
 } = require('./utilities');
 
-let now;
-
 // ------------ constants
 const prefix = `!!`; // command prefix
 
 // ------------ messaging functions
 const pingServers = async () => {
-  now = new Date();
-  showTime();
+  const now = new Date();
+  showTime(now);
   // List servers the client is connected to
-  client.guilds.cache.forEach(pingServer);
+  client.guilds.cache.forEach(server => pingServer(server, now));
 }
 
-const pingServer = async server => {
+const pingServer = async (server, time) => {
   logServerDetails(server);
 
-  if (shouldSendMessage(server.id)) {
+  if (shouldSendMessage(server.id, time)) {
     let positivityChannelId = getPrioritizedChannelId(server.channels.cache, `positivity`);
     // console.log(positivityChannelId);
     sendMessageWithRandomChance(positivityChannelId);
   }
 }
 
-const showTime = () => {
-  console.log(`Trigger time: ${leadingZero(now.getHours())}:${leadingZero(now.getMinutes())}`);
+const showTime = time => {
+  console.log(`Trigger time: ${leadingZero(time.getHours())}:${leadingZero(time.getMinutes())}`);
 }
 
 const logServerDetails = async server => {
@@ -43,9 +41,16 @@ const logServerDetails = async server => {
   console.log(` > Text Channels: `, server.channels.cache.map(channel => `${channel.name} - ${channel.id}`));
 }
 
-const isOnTheHour = () => now.getMinutes === 0;
-const isDev = serverId => process.env.DEV === `true` && serverId === process.env.TEST_SERVER
-const shouldSendMessage = serverId => isDev(serverId) || (process.env.DEV === undefined && isOnTheHour());
+const isOnTheHour = time => time.getMinutes() === 0;
+const isDev = serverId => process.env.DEV === `true` && serverId === process.env.TEST_SERVER;
+const shouldSendMessage = (serverId, time) => {
+  // console.log(`isdev `, isDev(serverId));
+  // console.log(`DEV false`, !process.env.DEV);
+  // console.log(`onthehour `, isOnTheHour(time));
+  // console.log(`together `, (!process.env.DEV && isOnTheHour(time)));
+  // console.log(`all `, isDev(serverId) || (!process.env.DEV && isOnTheHour(time)));
+  return isDev(serverId) || (!process.env.DEV && isOnTheHour(time));
+}
 
 const getPrioritizedChannelId = (channels, priorityChannelName) => {
   let prioritizedChannelId;
@@ -88,6 +93,7 @@ const sendMessage = async channelId => {
 
 const pingDiscord = async () => {
   // ------------ log in client
+  // console.log(client.readyAt)
   if (!client.readyAt) {
    await client.login(process.env.AUTH_TOKEN);
   } else {
