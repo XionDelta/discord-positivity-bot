@@ -6,7 +6,7 @@ const config = require('./config');
 
 const {
   getQuote,
-  getOnlineQuote,
+  getOnlineQuoteToday,
   getRandomInt,
   leadingZero,
 } = require('./utilities');
@@ -30,6 +30,13 @@ const pingServer = async (server, time) => {
     // console.log(positivityChannelId);
     sendMessageWithRandomChance(positivityChannelId);
   }
+
+  if (shouldSendDailyMessage(server.id, time)) {
+    let positivityChannelId = getPrioritizedChannelId(server.channels.cache, `positivity`);
+    // console.log(positivityChannelId);
+    sendTodayMessage(positivityChannelId);
+  }
+
 }
 
 const showTime = time => {
@@ -44,6 +51,8 @@ const logServerDetails = async server => {
 const isOnTheHour = time => time.getMinutes() === 0;
 const isDev = serverId => process.env.DEV === `true` && serverId === process.env.TEST_SERVER;
 const shouldSendMessage = (serverId, time) => isDev(serverId) || (!process.env.DEV && isOnTheHour(time));
+
+const shouldSendDailyMessage = (serverId, time) => shouldSendMessage(serverId, time) && time.getHours() === 7;
 
 const getPrioritizedChannelId = (channels, priorityChannelName) => {
   let prioritizedChannelId;
@@ -77,6 +86,17 @@ const sendMessage = async channelId => {
   try {
     const channel = await client.channels.fetch(channelId);
     const quote = getQuote();
+    console.log(`sending to ${channelId}: ${quote}`);
+    channel.send(quote);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const sendTodayMessage = async channelId => {
+  try {
+    const channel = await client.channels.fetch(channelId);
+    const quote = getOnlineQuoteToday();
     console.log(`sending to ${channelId}: ${quote}`);
     channel.send(quote);
   } catch (err) {

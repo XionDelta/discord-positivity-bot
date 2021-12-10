@@ -3,14 +3,19 @@ const quotes = require('./data/quotes.json');
 const axios = require("axios").default;
 
 // ------------ constants
-const options = {
-  method: `GET`,
-  url: `https://zenquotes.io/api/random`,
-};
+const options = url => {
+  return {
+    method: `GET`,
+    url,
+  };
+}
 
 const getQuote = () => quotes[getRandomInt(0, quotes.length)];
 
-const getOnlineQuote = async () => {
+const getOnlineQuoteRandom = async () => getOnlineQuote(options(`https://zenquotes.io/api/random`));
+const getOnlineQuoteToday = async () => getOnlineQuote(options(`https://zenquotes.io/api/today`));
+
+const getOnlineQuote = async options => {
   try {
     const response = await axios.request(options);
     const { a, q } = response.data[0];
@@ -31,7 +36,8 @@ const leadingZero = number => number < 10 ? `0${number}` : number;
 
 module.exports = {
   getQuote,
-  getOnlineQuote,
+  getOnlineQuoteRandom,
+  getOnlineQuoteToday,
   getRandomInt,
   leadingZero,
 }
