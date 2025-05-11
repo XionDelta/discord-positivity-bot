@@ -8,5 +8,5 @@ steps:
   - --region=europe-west2
   - --source=.
   - --trigger-topic=trigger-positivity-message
-  - --runtime=nodejs14
+  - --runtime=nodejs22
   - --entry-point=pingDiscord
