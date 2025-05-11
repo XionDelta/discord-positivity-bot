@@ -1,8 +1,14 @@
 // ------------ import modules
 require('dotenv').config();
-const Discord = require('discord.js');
-const client = new Discord.Client();
+const { Discord, Client, GatewayIntentBits } = require('discord.js');
 const config = require('./config');
+
+const client = new Client({
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.DirectMessages,
+	],
+});
 
 const {
   getQuote,
@@ -58,7 +64,7 @@ const getPrioritizedChannelId = (channels, priorityChannelName) => {
   let prioritizedChannelId;
 
   for (let channel of channels.values()) {
-    if (channel.type === `text`) {
+    if (channel.type === 0) { // text I guess?
       if (channel.name === priorityChannelName) {
         prioritizedChannelId = channel.id;
         break;
