@@ -6,6 +6,7 @@ const config = require('./config');
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMembers,
 		GatewayIntentBits.DirectMessages,
 	],
 });
@@ -29,18 +30,18 @@ const pingServers = async () => {
 }
 
 const pingServer = async (server, time) => {
-  logServerDetails(server);
+  // logServerDetails(server);
 
   if (shouldSendMessage(server.id, time)) {
-    let positivityChannelId = getPrioritizedChannelId(server.channels.cache, `positivity`);
+    // let positivityChannelId = getPrioritizedChannelId(server.channels.cache, `positivity`);
     // console.log(positivityChannelId);
-    sendMessageWithRandomChance(positivityChannelId);
+    sendMessageToUserWithRoleWithRandomChance(server, "positivity");
   }
 
   if (shouldSendDailyMessage(server.id, time)) {
     let positivityChannelId = getPrioritizedChannelId(server.channels.cache, `positivity`);
     // console.log(positivityChannelId);
-    sendTodayMessage(positivityChannelId);
+    sendTodayMessageToChannel(positivityChannelId);
   }
 
 }
@@ -78,17 +79,38 @@ const getPrioritizedChannelId = (channels, priorityChannelName) => {
   return prioritizedChannelId !== undefined ? prioritizedChannelId : channels.first().id;
 }
 
-const sendMessageWithRandomChance = (channelId, maxRandom) => {
+const sendMessageToUserWithRoleWithRandomChance = (server, roleName, maxRandom) => {
   const max = maxRandom || config.RANDOM_MAX_VALUE_FOR_SEND_CHANCE || 1;
   // defaults to always sending if no configuration
   const randomInt = getRandomInt(0, max);
   // console.log(randomInt);
   if (randomInt === 0) {
-    sendMessage(channelId);
+    sendMessageToUsersWithRole(server, roleName);
   }
 }
 
-const sendMessage = async channelId => {
+const sendMessageToUsersWithRole = async (server, roleName) => {
+  let res = await server.members.fetch();
+  res.forEach((member) => {
+      // console.log(member.user.username);
+      if (member.roles.cache.some(role => role.name === roleName)) {
+        // console.dir(member.roles.cache.some(role => role.name === "positivity"));
+        member.user.send(getQuote());
+      }
+  });
+}
+
+const sendMessageToChannelWithRandomChance = (channelId, maxRandom) => {
+  const max = maxRandom || config.RANDOM_MAX_VALUE_FOR_SEND_CHANCE || 1;
+  // defaults to always sending if no configuration
+  const randomInt = getRandomInt(0, max);
+  // console.log(randomInt);
+  if (randomInt === 0) {
+    sendMessageToChannel(channelId);
+  }
+}
+
+const sendMessageToChannel = async channelId => {
   try {
     const channel = await client.channels.fetch(channelId);
     const quote = getQuote();
@@ -99,7 +121,7 @@ const sendMessage = async channelId => {
   }
 }
 
-const sendTodayMessage = async channelId => {
+const sendTodayMessageToChannel = async channelId => {
   try {
     const channel = await client.channels.fetch(channelId);
     const quote = getOnlineQuoteToday();
@@ -121,7 +143,7 @@ const pingDiscord = async () => {
 
   // ------------ event handlers
   client.on('ready', async () => {
-    console.log(`ready, ${client.readyAt}`);
+    console.log(`Ready, ${client.readyAt}`);
     pingServers();
   });
 
