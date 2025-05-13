@@ -13,10 +13,15 @@ const client = new Client({
 
 const {
   getQuote,
-  getOnlineQuoteToday,
-  getRandomInt,
-  leadingZero,
 } = require('./utilities');
+
+const {
+  showTime,
+} = require('./functions/logging');
+
+const {
+  sendMessageToUserWithRoleWithRandomChance,
+} = require('./functions/dms');
 
 // ------------ constants
 const prefix = `!!`; // command prefix
@@ -25,7 +30,7 @@ const prefix = `!!`; // command prefix
 const pingServers = async () => {
   const now = new Date();
   showTime(now);
-  // List servers the client is connected to
+  // Ping servers the bot is connected to
   client.guilds.cache.forEach(server => pingServer(server, now));
 }
 
@@ -43,94 +48,12 @@ const pingServer = async (server, time) => {
     // console.log(positivityChannelId);
     sendTodayMessageToChannel(positivityChannelId);
   }
-
-}
-
-const showTime = time => {
-  console.log(`Trigger time: ${leadingZero(time.getHours())}:${leadingZero(time.getMinutes())}`);
-}
-
-const logServerDetails = async server => {
-  console.log(`Server: ${server.name} - ${server.id}`);
-  console.log(` > Text Channels: `, server.channels.cache.map(channel => `${channel.name} - ${channel.id}`));
 }
 
 const isOnTheHour = time => time.getMinutes() === 0;
 const isDev = serverId => process.env.DEV === `true` && serverId === process.env.TEST_SERVER;
 const shouldSendMessage = (serverId, time) => isDev(serverId) || (!process.env.DEV && isOnTheHour(time));
-
 const shouldSendDailyMessage = (serverId, time) => shouldSendMessage(serverId, time) && time.getHours() === 7;
-
-const getPrioritizedChannelId = (channels, priorityChannelName) => {
-  let prioritizedChannelId;
-
-  for (let channel of channels.values()) {
-    if (channel.type === 0) { // text I guess?
-      if (channel.name === priorityChannelName) {
-        prioritizedChannelId = channel.id;
-        break;
-      }
-      if (channel.name === `general` && prioritizedChannelId === undefined) {
-        prioritizedChannelId = channel.id;
-      }
-    }
-  }
-
-  return prioritizedChannelId !== undefined ? prioritizedChannelId : channels.first().id;
-}
-
-const sendMessageToUserWithRoleWithRandomChance = (server, roleName, maxRandom) => {
-  const max = maxRandom || config.RANDOM_MAX_VALUE_FOR_SEND_CHANCE || 1;
-  // defaults to always sending if no configuration
-  const randomInt = getRandomInt(0, max);
-  // console.log(randomInt);
-  if (randomInt === 0) {
-    sendMessageToUsersWithRole(server, roleName);
-  }
-}
-
-const sendMessageToUsersWithRole = async (server, roleName) => {
-  let res = await server.members.fetch();
-  res.forEach((member) => {
-      // console.log(member.user.username);
-      if (member.roles.cache.some(role => role.name === roleName)) {
-        // console.dir(member.roles.cache.some(role => role.name === "positivity"));
-        member.user.send(getQuote());
-      }
-  });
-}
-
-const sendMessageToChannelWithRandomChance = (channelId, maxRandom) => {
-  const max = maxRandom || config.RANDOM_MAX_VALUE_FOR_SEND_CHANCE || 1;
-  // defaults to always sending if no configuration
-  const randomInt = getRandomInt(0, max);
-  // console.log(randomInt);
-  if (randomInt === 0) {
-    sendMessageToChannel(channelId);
-  }
-}
-
-const sendMessageToChannel = async channelId => {
-  try {
-    const channel = await client.channels.fetch(channelId);
-    const quote = getQuote();
-    console.log(`sending to ${channelId}: ${quote}`);
-    channel.send(quote);
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-const sendTodayMessageToChannel = async channelId => {
-  try {
-    const channel = await client.channels.fetch(channelId);
-    const quote = getOnlineQuoteToday();
-    console.log(`sending to ${channelId}: ${quote}`);
-    channel.send(quote);
-  } catch (err) {
-    console.log(err);
-  }
-}
 
 const pingDiscord = async () => {
   // ------------ log in client
