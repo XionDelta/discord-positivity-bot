@@ -40,7 +40,7 @@ const pingServer = async (server, time) => {
   if (shouldSendMessage(server.id, time)) {
     // let positivityChannelId = getPrioritizedChannelId(server.channels.cache, `positivity`);
     // console.log(positivityChannelId);
-    sendMessageToUserWithRoleWithRandomChance(server, "positivity");
+    sendMessageToUserWithRoleWithRandomChance(server, "positivity", isOnTheHour(time) ? 16 : 16 * 3);
   }
 
   if (shouldSendDailyMessage(server.id, time)) {
