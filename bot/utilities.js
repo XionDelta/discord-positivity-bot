@@ -1,24 +1,17 @@
 // ------------ import modules
 const quotes = require('./data/quotes.json');
-const axios = require("axios").default;
-
-// ------------ constants
-const options = url => {
-  return {
-    method: `GET`,
-    url,
-  };
-}
 
 const getQuote = () => quotes[getRandomInt(0, quotes.length)];
 
-const getOnlineQuoteRandom = async () => getOnlineQuote(options(`https://zenquotes.io/api/random`));
-const getOnlineQuoteToday = async () => getOnlineQuote(options(`https://zenquotes.io/api/today`));
+const getOnlineQuoteRandom = async () => getOnlineQuote(`https://zenquotes.io/api/random`);
+const getOnlineQuoteToday = async () => getOnlineQuote(`https://zenquotes.io/api/today`);
 
-const getOnlineQuote = async options => {
+const getOnlineQuote = async url => {
   try {
-    const response = await axios.request(options);
-    const { a, q } = response.data[0];
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    const { a, q } = data[0];
     return `${q} -${a}`;
   } catch (err) {
     console.error(err);
